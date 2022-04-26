@@ -1,4 +1,27 @@
 {
-  "indexes": [],
+  "indexes": [
+    {
+      "collectionGroup": "transactions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "userId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "yearMonth",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "day",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "created",
+          "order": "DESCENDING"
+        }
+      ]
+    }
+  ],
   "fieldOverrides": []
 }

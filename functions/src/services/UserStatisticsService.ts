@@ -1,6 +1,6 @@
 import {Transaction} from "../DTOs/Models/Transaction.model";
 import * as admin from "firebase-admin";
-import {UserStatistics} from "../DTOs/Models/UserStatistics.model";
+import {CategoriesStats, UserStatistics} from "../DTOs/Models/UserStatistics.model";
 import {DocumentSnapshot} from "@google-cloud/firestore";
 
 /**
@@ -12,6 +12,9 @@ export class UserStatisticsService {
   private yearMonth;
 
   constructor(transaction: Transaction) {
+    admin.initializeApp({
+      credential: admin.credential.applicationDefault(),
+    });
     this.db = admin.firestore();
     this.yearMonth = transaction.yearMonth;
     this.userId = transaction.userId;
@@ -44,21 +47,52 @@ export class UserStatisticsService {
     return transactions;
   }
 
-  private calcNewUserStatistics(userTransactions: Transaction[]):
+  calcNewUserStatistics(userTransactions: Transaction[]):
   UserStatistics {
     const initialValue: UserStatistics = {
       totalValue: 0,
       transactionsCount: 0,
+      categoriesStats: {}
     };
     const newStats: UserStatistics =
         userTransactions.reduce((userStatsAcc: UserStatistics, transaction) => {
+          
           userStatsAcc = {
             totalValue: userStatsAcc.totalValue += +(transaction.valueInCents),
             transactionsCount: userStatsAcc.transactionsCount + 1,
+            categoriesStats: this.categriesStatsIteration(userStatsAcc, transaction),
           };
           return userStatsAcc;
         }, initialValue);
     return newStats;
+  }
+
+  private categriesStatsIteration(userStatistics: UserStatistics, transaction: Transaction): CategoriesStats {
+    const categoriesStats = userStatistics.categoriesStats;
+    const category = transaction.category;
+    if (categoriesStats[category.id]) {
+      const stats = categoriesStats[category.id].stats
+      return {
+        ...categoriesStats,
+        [category.id]: {
+          category,
+          stats: {
+            count: stats.count + 1,
+            value: stats.value + transaction.valueInCents
+          },
+        }
+      }
+    }
+    return {
+      ...categoriesStats,
+      [category.id]: {
+        category,
+        stats: {
+          count: 1,
+          value: transaction.valueInCents
+        }
+      }
+    }
   }
 
   private setUserStatistics(statistics: UserStatistics, userName: string):

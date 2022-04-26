@@ -6,4 +6,13 @@ export interface Transaction {
     yearMonth: YearMonthStr,
     description: string,
     userId: string
+    category: {
+        description: string,
+        id: string,
+        iconModel: {
+            fontFamily: string,
+            iconName: string,
+            codePoint: number,
+        }
+    },
 }
