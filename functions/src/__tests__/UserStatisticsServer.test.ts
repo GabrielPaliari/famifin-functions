@@ -3,7 +3,7 @@ import { userStatsResult } from "../mocks/user-stats.result";
 import { userTransactionsMock } from "../mocks/user-transactions.mock"
 
 describe('UserStatisticsService', () => {
-    const userStatService = new UserStatisticsService(userTransactionsMock[0]);
+    const userStatService = new UserStatisticsService({ newTransaction: userTransactionsMock[0]});
     const statsResult = userStatService.calcNewUserStatistics(userTransactionsMock);
 
     it('Should calculate general statistics properly given an array of transactions', () => {

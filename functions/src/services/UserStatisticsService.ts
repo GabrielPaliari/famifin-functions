@@ -1,23 +1,20 @@
 import {Transaction} from "../DTOs/Models/Transaction.model";
-import * as admin from "firebase-admin";
 import {CategoriesStats, UserStatistics} from "../DTOs/Models/UserStatistics.model";
 import {DocumentSnapshot} from "@google-cloud/firestore";
+import * as firebaseAdmin from "firebase-admin";
 
 /**
  * Service to calculate month statistics
  */
 export class UserStatisticsService {
-  private db: admin.firestore.Firestore;
+  private db: firebaseAdmin.firestore.Firestore;
   private userId;
   private yearMonth;
 
-  constructor(transaction: Transaction) {
-    admin.initializeApp({
-      credential: admin.credential.applicationDefault(),
-    });
-    this.db = admin.firestore();
-    this.yearMonth = transaction.yearMonth;
-    this.userId = transaction.userId;
+  constructor({newTransaction}: {newTransaction: Transaction}) {
+    this.db = firebaseAdmin.firestore();
+    this.yearMonth = newTransaction.yearMonth;
+    this.userId = newTransaction.userId;
   }
 
   async updateUserStatistics(): Promise<any> {
